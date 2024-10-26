@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
-import { ResponsiveLine } from "@nivo/line"
-import { useEffect,useState } from "react"
+import TimeseriesChart from "@/components/comps/timeSeriesChart"
+import { useEffect, useState } from "react"
 import './globals.css';
+import { ResponsiveLine } from "@nivo/line"
+import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 
 export default function Component() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -39,11 +41,16 @@ export default function Component() {
               Portfolio
             </Link>
           </nav>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-            <Button size="sm">Sign Up</Button>
+          <div className="flex justify-between items-center gap-6">
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm">
+                Sign In
+              </Button>
+              <Button size="sm">Sign Up</Button>
+            </div>
+            <div className="flex items-center gap-2">
+{isDarkMode?   <MoonIcon onClick={()=>setIsDarkMode(!isDarkMode)} className="h-6 w-6 text-purple-800 cursor-pointer" /> :(  <SunIcon  onClick={()=>setIsDarkMode(!isDarkMode)} className="h-6 w-6 text-yellow-500 cursor-pointer" />)}
+            </div>
           </div>
         </div>
       </header>
@@ -64,7 +71,7 @@ export default function Component() {
                   <div className="text-lg font-medium text-primary">$130.25</div>
                 </div>
                 <div className="text-sm text-muted-foreground">+2.5% today</div>
-                <TimeseriesChart className="w-full aspect-[4/3]" />
+                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
               </div>
             </Card>
             <Card>
@@ -74,7 +81,7 @@ export default function Component() {
                   <div className="text-lg font-medium text-primary">$280.15</div>
                 </div>
                 <div className="text-sm text-muted-foreground">-1.2% today</div>
-                <TimeseriesChart className="w-full aspect-[4/3]" />
+                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
               </div>
             </Card>
             <Card>
@@ -84,7 +91,7 @@ export default function Component() {
                   <div className="text-lg font-medium text-primary">$3,150.75</div>
                 </div>
                 <div className="text-sm text-muted-foreground">+0.8% today</div>
-                <TimeseriesChart className="w-full aspect-[4/3]" />
+                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
               </div>
             </Card>
             <Card>
@@ -94,7 +101,7 @@ export default function Component() {
                   <div className="text-lg font-medium text-primary">$650.25</div>
                 </div>
                 <div className="text-sm text-muted-foreground">-3.1% today</div>
-                <TimeseriesChart className="w-full aspect-[4/3]" />
+                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
               </div>
             </Card>
             <Card>
@@ -104,7 +111,7 @@ export default function Component() {
                   <div className="text-lg font-medium text-primary">$615.50</div>
                 </div>
                 <div className="text-sm text-muted-foreground">+4.2% today</div>
-                <TimeseriesChart className="w-full aspect-[4/3]" />
+                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
               </div>
             </Card>
             <Card>
@@ -114,7 +121,7 @@ export default function Component() {
                   <div className="text-lg font-medium text-primary">$2,450.75</div>
                 </div>
                 <div className="text-sm text-muted-foreground">-0.5% today</div>
-                <TimeseriesChart className="w-full aspect-[4/3]" />
+                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
               </div>
             </Card>
           </div>
@@ -209,159 +216,6 @@ export default function Component() {
   )
 }
 
-function LineChart(props) {
-  return (
-    <div {...props}>
-      <ResponsiveLine
-        data={[
-          {
-            id: "Desktop",
-            data: [
-              { x: "Jan", y: 43 },
-              { x: "Feb", y: 137 },
-              { x: "Mar", y: 61 },
-              { x: "Apr", y: 145 },
-              { x: "May", y: 26 },
-              { x: "Jun", y: 154 },
-            ],
-          },
-          {
-            id: "Mobile",
-            data: [
-              { x: "Jan", y: 60 },
-              { x: "Feb", y: 48 },
-              { x: "Mar", y: 177 },
-              { x: "Apr", y: 78 },
-              { x: "May", y: 96 },
-              { x: "Jun", y: 204 },
-            ],
-          },
-        ]}
-        margin={{ top: 10, right: 10, bottom: 40, left: 40 }}
-        xScale={{
-          type: "point",
-        }}
-        yScale={{
-          type: "linear",
-        }}
-        axisTop={null}
-        axisRight={null}
-        axisBottom={{
-          tickSize: 0,
-          tickPadding: 16,
-        }}
-        axisLeft={{
-          tickSize: 0,
-          tickValues: 5,
-          tickPadding: 16,
-        }}
-        colors={["#2563eb", "#e11d48"]}
-        pointSize={6}
-        useMesh={true}
-        gridYValues={6}
-        theme={{
-          tooltip: {
-            chip: {
-              borderRadius: "9999px",
-            },
-            container: {
-              fontSize: "12px",
-              textTransform: "capitalize",
-              borderRadius: "6px",
-            },
-          },
-          grid: {
-            line: {
-              stroke: "#f3f4f6",
-            },
-          },
-        }}
-        role="application"
-      />
-    </div>
-  )
-}
 
 
-function TimeseriesChart(props) {
-  return (
-    <div {...props}>
-      <ResponsiveLine
-        data={[
-          {
-            id: "Desktop",
-            data: [
-              { x: "2018-01-01", y: 7 },
-              { x: "2018-01-02", y: 5 },
-              { x: "2018-01-03", y: 11 },
-              { x: "2018-01-04", y: 9 },
-              { x: "2018-01-05", y: 12 },
-              { x: "2018-01-06", y: 16 },
-              { x: "2018-01-07", y: 13 },
-            ],
-          },
-          {
-            id: "Mobile",
-            data: [
-              { x: "2018-01-01", y: 9 },
-              { x: "2018-01-02", y: 8 },
-              { x: "2018-01-03", y: 13 },
-              { x: "2018-01-04", y: 6 },
-              { x: "2018-01-05", y: 8 },
-              { x: "2018-01-06", y: 14 },
-              { x: "2018-01-07", y: 11 },
-            ],
-          },
-        ]}
-        margin={{ top: 10, right: 20, bottom: 40, left: 40 }}
-        xScale={{
-          type: "time",
-          format: "%Y-%m-%d",
-          useUTC: false,
-          precision: "day",
-        }}
-        xFormat="time:%Y-%m-%d"
-        yScale={{
-          type: "linear",
-          min: 0,
-          max: "auto",
-        }}
-        axisTop={null}
-        axisRight={null}
-        axisBottom={{
-          tickSize: 0,
-          tickPadding: 16,
-          format: "%d",
-          tickValues: "every 1 day",
-        }}
-        axisLeft={{
-          tickSize: 0,
-          tickValues: 5,
-          tickPadding: 16,
-        }}
-        colors={["#2563eb", "#e11d48"]}
-        pointSize={6}
-        useMesh={true}
-        gridYValues={6}
-        theme={{
-          tooltip: {
-            chip: {
-              borderRadius: "9999px",
-            },
-            container: {
-              fontSize: "12px",
-              textTransform: "capitalize",
-              borderRadius: "6px",
-            },
-          },
-          grid: {
-            line: {
-              stroke: "#f3f4f6",
-            },
-          },
-        }}
-        role="application"
-      />
-    </div>
-  )
-}
+
