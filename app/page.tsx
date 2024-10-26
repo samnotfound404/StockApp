@@ -7,7 +7,6 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import TimeseriesChart from "@/components/comps/timeSeriesChart"
 import { useEffect, useState } from "react"
 import './globals.css';
-import { ResponsiveLine } from "@nivo/line"
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 
 export default function Component() {
@@ -37,7 +36,7 @@ export default function Component() {
             <Link href="#" className="text-muted-foreground hover:text-foreground" prefetch={false}>
               Watchlist
             </Link>
-            <Link href="/portfolio" className="text-muted-foreground hover:text-foreground" prefetch={false}>
+            <Link href="/Portfolio" className="text-muted-foreground hover:text-foreground" prefetch={false}>
               Portfolio
             </Link>
           </nav>
