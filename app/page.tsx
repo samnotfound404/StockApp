@@ -24,7 +24,7 @@ export default function Component() {
       <header className="bg-background border-b px-4 py-3 md:px-6 md:py-4">
         <div className="flex items-center justify-between max-w-6xl mx-auto">
           <Link href="#" className="text-lg font-bold" prefetch={false}>
-            StockTracker
+            StockSignal
           </Link>
           <nav className="hidden md:flex items-center gap-4">
             <Link href="#" className="text-muted-foreground hover:text-foreground" prefetch={false}>
@@ -64,7 +64,7 @@ export default function Component() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 p-2">
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-medium">Apple Inc.</div>
                   <div className="text-lg font-medium text-primary">$130.25</div>
@@ -74,7 +74,7 @@ export default function Component() {
               </div>
             </Card>
             <Card>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 p-2">
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-medium">Microsoft Corp.</div>
                   <div className="text-lg font-medium text-primary">$280.15</div>
@@ -84,7 +84,7 @@ export default function Component() {
               </div>
             </Card>
             <Card>
-              <div className="flex flex-col gap-4 ">
+              <div className="flex flex-col gap-4 p-2">
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-medium">Amazon.com, Inc.</div>
                   <div className="text-lg font-medium text-primary">$3,150.75</div>
@@ -94,7 +94,7 @@ export default function Component() {
               </div>
             </Card>
             <Card>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 p-2">
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-medium">Tesla, Inc.</div>
                   <div className="text-lg font-medium text-primary">$650.25</div>
@@ -104,7 +104,7 @@ export default function Component() {
               </div>
             </Card>
             <Card>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 p-2">
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-medium">Nvidia Corporation</div>
                   <div className="text-lg font-medium text-primary">$615.50</div>
@@ -114,7 +114,7 @@ export default function Component() {
               </div>
             </Card>
             <Card>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 p-2">
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-medium">Alphabet Inc.</div>
                   <div className="text-lg font-medium text-primary">$2,450.75</div>
