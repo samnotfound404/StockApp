@@ -7,11 +7,25 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import TimeseriesChart from "@/components/comps/timeSeriesChart"
 import { useEffect, useState } from "react"
 import './globals.css';
+import axios from "axios"
+import {DollarSign } from 'lucide-react'
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 
 export default function Component() {
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const [query, setquery] = useState('')
+  const [Stocks, setStocks] = useState([])
+  const handlesearch = async (event: React.FormEvent<HTMLFormElement>) => { 
+    event.preventDefault(); 
+    
+    try {
+      const response = await axios.get(`http://localhost:3001/stock/daily?symbol=${query}`);
+      setStocks(response.data);
+      console.log(response.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -20,12 +34,13 @@ export default function Component() {
     }
   }, [isDarkMode]);
   return (
-    <div className="flex flex-col min-h-screen">
+    <div>
       <header className="bg-background border-b px-4 py-3 md:px-6 md:py-4">
         <div className="flex items-center justify-between max-w-6xl mx-auto">
-          <Link href="#" className="text-lg font-bold" prefetch={false}>
-            StockSignal
-          </Link>
+        <Link className="flex items-center justify-center" href="#">
+          <DollarSign className="h-6 w-6 text-primary" />
+          <span className="ml-2 text-2xl font-bold">StockSignal</span>
+        </Link>
           <nav className="hidden md:flex items-center gap-4">
             <Link href="#" className="text-muted-foreground hover:text-foreground" prefetch={false}>
               Explore Stocks
@@ -41,14 +56,22 @@ export default function Component() {
             </Link>
           </nav>
           <div className="flex justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                Sign In
-              </Button>
-              <Button size="sm">Sign Up</Button>
-            </div>
+            
             <div className="flex items-center gap-2">
 {isDarkMode?   <MoonIcon onClick={()=>setIsDarkMode(!isDarkMode)} className="h-6 w-6 text-purple-800 cursor-pointer" /> :(  <SunIcon  onClick={()=>setIsDarkMode(!isDarkMode)} className="h-6 w-6 text-yellow-500 cursor-pointer" />)}
+<svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-8 w-8 rounded-full bg-gray-300 p-1 cursor-pointer"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="8" r="4" />  {/* Profile image - head */}
+          <path d="M6 14c0-2 6-2 6-2s6 0 6 2" />  {/* Shoulders */}
+        </svg>
             </div>
           </div>
         </div>
@@ -59,7 +82,10 @@ export default function Component() {
             <h2 className="text-2xl font-bold">Explore Stocks</h2>
             <div className="relative flex-1 max-w-md">
               <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Search stocks..." className="pl-8 w-full" />
+              <form onSubmit={handlesearch}>
+
+              <Input type="search" placeholder="Search stocks..." value={query} onChange={(e) => {setquery(e.target.value) }} className="pl-8 w-full" />
+              </form>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

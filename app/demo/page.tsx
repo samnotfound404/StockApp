@@ -42,7 +42,7 @@ export default function Component() {
   useEffect(() => {
     const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
+      // setSession(session);
     };
     fetchSession();
   }, []);
@@ -241,7 +241,7 @@ export default function Component() {
           {step > 1 && (
             <Button onClick={() => setStep(prev => prev - 1)}><ChevronLeft /> Back</Button>
           )}
-          <Button onClick={nextStep} variant="primary" className="ml-auto">
+          <Button onClick={nextStep}  className="ml-auto">
             {step < steps.length ? 'Next' : 'Confirm'}
             {step === steps.length && <Check className="ml-2" />}
           </Button>
@@ -255,7 +255,7 @@ export default function Component() {
           <p><strong>Branch:</strong> {bankDetails.BRANCH}</p>
           <p><strong>IFSC:</strong> {bankDetails.IFSC}</p>
           {/* Add more bank details as needed */}
-          <Button onClick={confirmDetails} className="mt-4" variant="success">Confirm and Submit</Button>
+          <Button onClick={confirmDetails} className="mt-4">Confirm and Submit</Button>
         </div>
       )}
     </div>
