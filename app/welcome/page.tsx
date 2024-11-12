@@ -173,7 +173,7 @@ export default function WelcomePage() {
                   alt="StockSignal Dashboard Preview"
                   className="aspect-video overflow-hidden rounded-xl object-cover object-center"
                   height="310"
-                  src="/placeholder.svg?height=310&width=550"
+                  src="/images/abc.png?height=310&width=550"
                   width="550"
                 />
               </div>
