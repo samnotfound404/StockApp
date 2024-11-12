@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import supabase from '../../client'; // Adjust the import path if necessary
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,17 @@ export default function SignIn() {
   interface InputChangeEvent extends React.ChangeEvent<HTMLInputElement> {
     target: HTMLInputElement & EventTarget;
   }
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/portfolio');
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   const handleInputChange = (e: InputChangeEvent) => {
     const { name, value } = e.target;
@@ -52,7 +63,7 @@ export default function SignIn() {
     if (error) {
       setError(error.message)
     } else {
-      router.push('/Portfolio') // Replace with the route you want to redirect to after sign-in
+      router.push('/portfolio') 
     }
   }
 

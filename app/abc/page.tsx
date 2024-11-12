@@ -21,12 +21,14 @@ const TestConnection = () => {
   useEffect(() => {
     const sendData = async () => {
       try {
+       await supabase.auth.getSession().then((session) => {console.log("session", session)})
+       
         // Insert dummy data into 'users' table
         const { data: insertedData, error } = await supabase
           .from('users')
           .insert([
             {
-              user_id: 5,
+              user_id: 7,
               full_name: "John Doe",
               bank_acc_no: "1234567890",
               aadhar_no: 123456789012,
