@@ -7,32 +7,51 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import TimeseriesChart from "@/components/comps/timeSeriesChart";
 import { useEffect, useState } from "react";
 import './globals.css';
-import axios from "axios";
 import { DollarSign } from 'lucide-react';
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import StockCard from '@/components/comps/stockCard';
-import { fetchStockData } from "@/helpers/api";
-import { useRouter } from 'next/navigation';
-
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import SearchWidget from "@/components/comps/searchwidget";
 export default function Component() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [query, setQuery] = useState('');
   const [stocks, setStocks] = useState([]);
   const router = useRouter();
+  const searchParams = useSearchParams() ;
+  const pathname = usePathname();
+  const {replace} = useRouter ();
 
-  const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      const stockData = await fetchStockData(query); // Use the fetchStockData function
-      console.log(stockData);
-
-      // Navigate to the dashboard with the symbol in the query
-      router.push(`/dashboard?symbol=${query}`);
-    } catch (err) {
-      console.error('Error fetching stock data:',err.message);
+  function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault(); // Prevent default form submission
+    const formData = new FormData(e.currentTarget);
+    const query = formData.get('query') as string;
+    if (query) {
+      // Redirect to /dashboard with query as symbol
+      window.location.href = `/dashboard?symbol=${query}`;
     }
-  };
+  }
+  // const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   try {
+  //     const stockData = await fetchStockData(query); // Use the fetchStockData function
+  //     console.log(stockData);
 
+  //     // Navigate to the dashboard with the symbol in the query
+  //     router.push(`/dashboard?symbol=${query}`);
+  //   } catch (err) {
+  //     console.error('Error fetching stock data:');
+  //   }
+  // };
+  
+function handleSearch1(term:string){
+  const params=new URLSearchParams(searchParams);
+  if (term) {
+    params. set('query',term);
+    } else {
+    params.delete('query');
+    }
+    replace(`${pathname}?${params.toString()}`);
+}
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -93,9 +112,20 @@ export default function Component() {
             <h2 className="text-2xl font-bold">Explore Stocks</h2>
             <div className="relative flex-1 max-w-md">
               <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <form onSubmit={handleSearch}>
+              {/* <form onSubmit={handleSearch}>
                 <Input type="search" placeholder="Search stocks..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-8 w-full" />
-              </form>
+              </form> */}
+               {/* <form onSubmit={handleFormSubmit}>
+                <Input
+                  type="search"
+                  name="query"
+                  placeholder="Search stocks..."
+                  onChange={(e) => handleSearch1(e.target.value)}
+                  defaultValue={searchParams.get("query") || ""}
+                  className="pl-8 w-full"
+                />
+              </form> */}
+              <SearchWidget />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
