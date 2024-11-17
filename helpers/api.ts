@@ -1,10 +1,65 @@
 import axios from 'axios';
+import supabase from '../client'; // Ensure Supabase client is imported
 
 /**
  * Fetches bank details using an IFSC code.
  * @param ifscCode - The IFSC code to fetch bank details.
  * @returns The bank details or an error message.
  */
+export const addToWatchlist = async (symbol: string, companyName?: string) => {
+    try {
+      // 1. Check if the stock exists in the 'stocks' table
+      const { data: stock, error: stockError } = await supabase
+        .from('stocks')
+        .select('*')
+        .eq('symbol', symbol)
+        .single();
+  
+      let stockId: string;
+  
+      if (stockError) {
+        // 2. Add the stock to the 'stocks' table if it doesn't exist
+        const { data: newStock, error: newStockError } = await supabase
+          .from('stocks')
+          .insert([{ symbol, company_name: companyName || 'Unknown' }])
+          .select('*')
+          .single();
+  
+        if (newStockError) throw new Error('Failed to add stock to the database.');
+        stockId = newStock.stock_id;
+      } else {
+        stockId = stock.stock_id;
+      }
+  
+      // 3. Get the user's ID from the session
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+     console.log(session)
+      if (sessionError || !session) throw new Error('User not authenticated.');
+      const userId = session.user.id;
+  
+      // 4. Add the stock to the user's watchlist
+      const { data: watchlistEntry, error: watchlistError } = await supabase
+        .from('watchlist')
+        .insert([{ user_id: userId, stock_id: stockId }]);
+  
+      if (watchlistError) throw new Error('Failed to add stock to watchlist.');
+  
+      return {
+        success: true,
+        message: 'Stock successfully added to watchlist.',
+        watchlistEntry,
+      };
+    } catch (error: any) {
+      console.error('Error in addToWatchlist:', error.message);
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  };
 export const fetchBankDetails = async (ifscCode: string) => {
   try {
     const response = await axios.get(
