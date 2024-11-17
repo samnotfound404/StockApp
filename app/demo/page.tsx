@@ -98,9 +98,10 @@ export default function Component() {
 
   const confirmDetails = async () => {
     const { name, email, bankAccountNumber, ifscCode, idType, idNumber, password } = formData;
+    console.log('Submitting data:', formData);
     const dob = new Date().toISOString();
   
-    // Step 1: Sign up the user with email and password
+    // Step 1: Sign up the user with email and password (Supabase Auth)
     const { data: { user }, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -111,10 +112,16 @@ export default function Component() {
       return;
     }
   
+    if (!user) {
+      console.error('User is null after signup');
+      return;
+    }
+  
     console.log('User signed up successfully:', user);
   
-    // Step 2: Insert data into users table
+    // Step 2: Insert data into users table using the user_id from auth
     const { error: userError } = await supabase.from('users').insert({
+      user_id: user.id,  // Use the generated ID from the auth system
       full_name: name,
       email,
       bank_acc_no: bankAccountNumber,
@@ -122,14 +129,14 @@ export default function Component() {
       pan_no: idType === 'PAN' ? idNumber : null,
       dob,
     });
-    
+  
     if (userError) {
       console.error('Error inserting to users table:', userError.message);
       return;
     }
     console.log('Inserted into users table successfully');
   
-    // Step 3: Insert data into signup_check table
+    // Step 3: Insert data into signup_check table (if needed)
     const { error: signupError } = await supabase.from('signup_check').insert({
       bank_acc_no: bankAccountNumber,
       fullname: name,
@@ -138,30 +145,31 @@ export default function Component() {
       email,
       registered: true,
     });
-    
+  
     if (signupError) {
       console.error('Error inserting to signup_check table:', signupError.message);
       return;
     }
     console.log('Inserted into signup_check table successfully');
   
-    // Step 4: Insert data into bank_details table
+    // Step 4: Insert data into bank_details table (if needed)
     const { error: bankError } = await supabase.from('bank_details').insert({
       ifsc_code: ifscCode,
       bank_name: bankDetails?.BANK || '',
       bank_branch: bankDetails?.BRANCH || '',
     });
-    
+  
     if (bankError) {
       console.error('Error inserting to bank_details table:', bankError.message);
       return;
     }
     console.log('Inserted into bank_details table successfully');
   
-    console.log('Data inserted successfully into all tables');
+    // Data inserted successfully
     setIsConfirming(false);
     console.log('Data submitted successfully!');
   };
+  
   
 
   const renderStep = () => {
