@@ -10,18 +10,19 @@ import './globals.css';
 import axios from "axios"
 import {DollarSign } from 'lucide-react'
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
-
+import StockCard from '@/components/comps/stockCard';
 export default function Component() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [query, setquery] = useState('')
   const [Stocks, setStocks] = useState([])
-  const handlesearch = async (event: React.FormEvent<HTMLFormElement>) => { 
-    event.preventDefault(); 
-    
+  
+  const handlesearch = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     try {
       const response = await axios.get(`http://localhost:3001/stock/daily?symbol=${query}`);
       setStocks(response.data);
-      console.log(response.data)
+      console.log(response.data);
+      window.location.href = `/dashboard?symbol=${query}`;
     } catch (err) {
       console.log(err)
     }
@@ -89,66 +90,36 @@ export default function Component() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Card>
-              <div className="flex flex-col gap-4 p-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium">Apple Inc.</div>
-                  <div className="text-lg font-medium text-primary">$130.25</div>
-                </div>
-                <div className="text-sm text-muted-foreground">+2.5% today</div>
-                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
-              </div>
-            </Card>
-            <Card>
-              <div className="flex flex-col gap-4 p-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium">Microsoft Corp.</div>
-                  <div className="text-lg font-medium text-primary">$280.15</div>
-                </div>
-                <div className="text-sm text-muted-foreground">-1.2% today</div>
-                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
-              </div>
-            </Card>
-            <Card>
-              <div className="flex flex-col gap-4 p-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium">Amazon.com, Inc.</div>
-                  <div className="text-lg font-medium text-primary">$3,150.75</div>
-                </div>
-                <div className="text-sm text-muted-foreground">+0.8% today</div>
-                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
-              </div>
-            </Card>
-            <Card>
-              <div className="flex flex-col gap-4 p-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium">Tesla, Inc.</div>
-                  <div className="text-lg font-medium text-primary">$650.25</div>
-                </div>
-                <div className="text-sm text-muted-foreground">-3.1% today</div>
-                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
-              </div>
-            </Card>
-            <Card>
-              <div className="flex flex-col gap-4 p-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium">Nvidia Corporation</div>
-                  <div className="text-lg font-medium text-primary">$615.50</div>
-                </div>
-                <div className="text-sm text-muted-foreground">+4.2% today</div>
-                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
-              </div>
-            </Card>
-            <Card>
-              <div className="flex flex-col gap-4 p-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium">Alphabet Inc.</div>
-                  <div className="text-lg font-medium text-primary">$2,450.75</div>
-                </div>
-                <div className="text-sm text-muted-foreground">-0.5% today</div>
-                <TimeseriesChart  className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
-              </div>
-            </Card>
+    <StockCard
+        symbol="AAPL"
+        companyName="Apple Inc."
+        isDarkMode={true} // or false
+      />
+            <StockCard
+        symbol="MSFT"
+        companyName="Microsoft Corp"
+        isDarkMode={true} // or false
+      />
+            <StockCard
+        symbol="AMZN"
+        companyName="Amazon.com, Inc."
+        isDarkMode={true} // or false
+      />
+      <StockCard
+        symbol="TSLA"
+        companyName="Tesla, Inc."
+        isDarkMode={true} // or false
+      />
+      <StockCard
+        symbol="NVDA"
+        companyName="Nvidia Corporation"
+        isDarkMode={true} // or false
+      />
+      <StockCard
+        symbol="GOOG"
+        companyName="Alphabet Inc."
+        isDarkMode={true} // or false
+      />
           </div>
         </section>
         <section className="w-full lg:w-[40vw]">
