@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, memo } from "react";
 
-function TradingViewWidget() {
+interface TradingViewWidgetProps {
+  symbol: string;
+}
+
+function TradingViewWidget({ symbol }: TradingViewWidgetProps) {
   // Define the ref explicitly as HTMLDivElement | null
   const container = useRef<HTMLDivElement | null>(null);
 
@@ -18,7 +22,7 @@ function TradingViewWidget() {
         {
           "width": "1200",
           "height": "610",
-          "symbol": "NASDAQ:AAPL",
+          "symbol": "NASDAQ:${symbol}",
           "interval": "D",
           "timezone": "Etc/UTC",
           "theme": "light",
@@ -41,7 +45,7 @@ function TradingViewWidget() {
         container.current.appendChild(script);
       }
     }
-  }, []); // Empty dependency array ensures this runs only on mount
+  }, [symbol]); // Add symbol to the dependency array to update when it changes
 
   return (
     <div className="tradingview-widget-container" ref={container}>

@@ -4,32 +4,60 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useRouter } from 'next/navigation';
 import { Bell, Check, Search, TrendingUp, DollarSign } from 'lucide-react';
 import AmazonTradingViewWidget from "@/components/comps/amazontradingwidget";
 import TradingViewWidget from '@/components/comps/amazongraph';
 import '../globals.css';
-import { fetchMultipleStocks, addToWatchlist } from '@/helpers/api';
+import { fetchMultipleStocks, addToWatchlist, fetchStockData } from '@/helpers/api';
 
 const Component = () => {
-  const [stocks, setStocks] = useState<any[]>([]);
+  const router = useRouter();
+  const [symbol, setSymbol] = useState<string | null>(null);
+  const [currentStock, setCurrentStock] = useState<any | null>(null);
+  const [stocks, setStock] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [watchlistStatus, setWatchlistStatus] = useState<{ [key: string]: boolean }>({});
   const stockSymbols = ['AAPL', 'MSFT', 'NVDA', 'NFLX', 'TSLA'];
 
   useEffect(() => {
     const fetchStocks = async () => {
+      const query = new URLSearchParams(window.location.search);
+      const symbolParam = query.get('symbol');
+
+      if (symbolParam) {
+        setSymbol(symbolParam);
+        console.log(`Symbol found: ${symbolParam}`);
+
+        try {
+          setLoading(true); // Set loading state
+          const stockData = await fetchStockData(symbolParam);
+          console.log("stock data ", stockData);
+          setCurrentStock({ symbol: stockData.symbol, change: stockData.changePercent, price: stockData.currentPrice });
+          console.log(`Fetched stock data for ${symbolParam}:`, stockData);
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error(`Error fetching stock data for ${symbolParam}:`, error.message);
+          } else {
+            console.error('Unknown error:', error);
+          }
+        } finally {
+          setLoading(false); // Clear loading state
+        }
+      } else {
+        console.log("No symbol found in query params.");
+      }
+
       try {
         const data = await fetchMultipleStocks(stockSymbols);
-        setStocks(data);
-        console.log(data);
+        setStock(data);
+        console.log('Fetched multiple stocks:', data);
       } catch (error) {
         if (error instanceof Error) {
           console.error(error.message);
         } else {
           console.error(error);
         }
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -69,10 +97,10 @@ const Component = () => {
         <Card>
           <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 pb-4">
             <div>
-              <div className="text-xl font-bold">Amazon.com Inc (AMZN)</div>
+              <div className="text-xl font-bold">{currentStock?.symbol}</div>
               <div className="text-3xl font-bold mt-2">
-                $202.61
-                <span className="text-red-500 text-xl ml-2">-2.78%</span>
+                ${currentStock?.price}
+                <span className="text-red-500 text-xl ml-2">{currentStock?.changePercent}</span>
               </div>
               <div className="text-sm text-muted-foreground mt-1">
                 After Hours: $202.77{" "}
@@ -85,7 +113,7 @@ const Component = () => {
 
             <div className="flex gap-2">
               <Button
-                onClick={() => handleAddToWatchlist('AMZN', 'Amazon')}
+                onClick={() => symbol && handleAddToWatchlist(symbol, currentStock?.symbol || '')}
                 variant="outline"
                 size="sm"
                 disabled={watchlistStatus['AMZN']}
@@ -110,7 +138,7 @@ const Component = () => {
           </CardHeader>
 
           <div className="p-4">
-            <TradingViewWidget />
+            {symbol && <TradingViewWidget symbol={symbol} />}
           </div>
         </Card>
 
