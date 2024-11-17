@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { Eye, EyeOff } from 'lucide-react';
-
+import '../globals.css';
 interface BankDetails {
   BANK: string;
   BRANCH: string;

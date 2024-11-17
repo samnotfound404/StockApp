@@ -30,7 +30,7 @@ export default function SignIn() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        router.push('/portfolio');
+        router.push('/dashboard');
       }
     };
 

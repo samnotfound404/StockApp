@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { Bell, Search, TrendingUp,DollarSign } from 'lucide-react'
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
-
+import '../globals.css';
 const stockData = [
   { date: "Nov 12", price: 205 },
   { date: "Nov 13", price: 210 },
