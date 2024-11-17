@@ -1,8 +1,9 @@
+'use client'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, BarChart2, DollarSign, TrendingUp, Users, Shield, BookOpen } from "lucide-react"
 import Link from "next/link"
-
+import TradingViewTickerWidget from "@/components/comps/ticker";
 export default function WelcomePage() {
   return (
     <div className="flex flex-col relative min-h-screen">
@@ -32,7 +33,8 @@ export default function WelcomePage() {
           </div>
         </nav>
       </header>
-      
+      <TradingViewTickerWidget />
+
       <main className="flex-1 flex flex-col items-center text-center px-4">
         <section className="w-full flex items-center justify-center py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800">
           <div className="container px-4 md:px-6">
@@ -42,16 +44,16 @@ export default function WelcomePage() {
                   Master the Market with StockSignal
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                  Empower your investment decisions with StockSignal - your all-in-one platform for advanced stock analysis, 
+                  Empower your investment decisions with StockSignal - your all-in-one platform for advanced stock analysis,
                   intelligent portfolio management, and real-time market insights.
                 </p>
               </div>
               <div className="space-x-4">
-              <Link href="/demo_signin">
-                <Button size="lg">
-                  Start Investing Now
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href="/demo_signin">
+                  <Button size="lg">
+                    Start Investing Now
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </Link>
                 {/* <Button variant="outline" size="lg">Learn More</Button> */}
               </div>
@@ -72,7 +74,7 @@ export default function WelcomePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-500 dark:text-gray-400">
-                    Leverage AI-powered tools for in-depth stock analysis, technical indicators, and predictive modeling. 
+                    Leverage AI-powered tools for in-depth stock analysis, technical indicators, and predictive modeling.
                     Stay ahead of market trends with our cutting-edge analytical capabilities.
                   </p>
                 </CardContent>
@@ -86,7 +88,7 @@ export default function WelcomePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-500 dark:text-gray-400">
-                    Monitor your investments in real-time, track performance metrics, and receive personalized insights 
+                    Monitor your investments in real-time, track performance metrics, and receive personalized insights
                     to optimize your portfolio allocation and maximize returns.
                   </p>
                 </CardContent>
@@ -100,7 +102,7 @@ export default function WelcomePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-500 dark:text-gray-400">
-                    Receive timely, personalized notifications on market movements, price changes, and potential 
+                    Receive timely, personalized notifications on market movements, price changes, and potential
                     investment opportunities tailored to your investment strategy and risk profile.
                   </p>
                 </CardContent>
@@ -150,7 +152,7 @@ export default function WelcomePage() {
                 <div className="space-y-2">
                   <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Why Choose StockSignal?</h2>
                   <p className="max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-                    StockSignal combines cutting-edge technology with user-friendly design to provide you with the most 
+                    StockSignal combines cutting-edge technology with user-friendly design to provide you with the most
                     comprehensive and intuitive stock analysis platform on the market.
                   </p>
                 </div>

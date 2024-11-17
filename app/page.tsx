@@ -8,7 +8,7 @@ import TimeseriesChart from "@/components/comps/timeSeriesChart"
 import { useEffect, useState } from "react"
 import './globals.css';
 import axios from "axios"
-import {DollarSign } from 'lucide-react'
+import {DollarSign,Search } from 'lucide-react'
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import StockCard from '@/components/comps/stockCard';
 import { fetchStockData } from "@/helpers/api"
@@ -93,7 +93,7 @@ export default function Component() {
             <div className="relative flex-1 max-w-md">
               <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <form onSubmit={handlesearch}>
-
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input type="search" placeholder="Search stocks..." value={query} onChange={(e) => {setquery(e.target.value) }} className="pl-8 w-full" />
               </form>
             </div>
