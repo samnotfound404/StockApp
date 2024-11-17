@@ -8,7 +8,8 @@ import { Bell, Search, TrendingUp, DollarSign } from 'lucide-react';
 import AmazonTradingViewWidget from "@/components/comps/amazontradingwidget";
 // import AmazonTradingViewProfileWidget from "@/components/comps/amazonprofilewidget";
 import TradingViewWidget from '@/components/comps/amazongraph';
-
+import '../globals.css'
+import { fetchMultipleStocks } from '@/helpers/api';
 const NewsComponent = () => (
   <div className="my-6">
     <h3 className="text-2xl font-bold">Latest News</h3>
@@ -30,14 +31,27 @@ const AboutComponent = () => (
 );
 
 export default function Component() {
+  const [stocks, setStocks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const stockSymbols = ['AAPL', 'MSFT', 'NVDA', 'NFLX', 'TSLA'];
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    const fetchStocks = async () => {
+      try {
+        const data = await fetchMultipleStocks(stockSymbols);
+        setStocks(data);
+        console.log(data);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else {
+          console.error(error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchStocks();
   }, []);
 
   return (
@@ -93,69 +107,38 @@ export default function Component() {
           </div>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Similar Stocks</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="relative w-full">
-              <div
-                className="flex gap-4 overflow-x-auto scrollbar-hidden scroll-smooth p-4"
-                style={{ scrollSnapType: "x mandatory" }}
-              >
-                {[
-                  { name: "Apple", ticker: "AAPL", sector: "Technology", price: "$225.00", change: "0.00%", color: "text-neutral-500", arrow: "→" },
-                  { name: "Microsoft", ticker: "MSFT", sector: "Technology", price: "$415.00", change: "-1.81%", color: "text-red-500", arrow: "↓" },
-                  { name: "NVIDIA", ticker: "NVDA", sector: "Technology", price: "$141.98", change: "-4.45%", color: "text-red-500", arrow: "↓" },
-                  { name: "Netflix", ticker: "NFLX", sector: "Entertainment", price: "$823.96", change: "+3.53%", color: "text-green-500", arrow: "↑" },
-                  { name: "Tesla", ticker: "TSLA", sector: "Automotive", price: "$999.99", change: "+2.15%", color: "text-green-500", arrow: "↑" },
-                ].map((stock, index) => (
-                  <div
-                    key={index}
-                    className="border rounded-lg p-4 w-56 flex flex-col shrink-0"
-                    style={{ scrollSnapAlign: "center" }}
-                  >
-                    <div className="font-medium">{stock.name} ({stock.ticker})</div>
-                    <div className="text-sm text-muted-foreground">{stock.sector}</div>
-                    <div className="flex items-center justify-between text-sm mt-4">
-                      <div className="font-medium">{stock.price}</div>
-                      <div className={`flex items-center ${stock.color}`}>
-                        {stock.arrow} {stock.change}
-                      </div>
+        <div className="grid gap-6 md:grid-cols-1">
+      <Card>
+        <CardHeader>
+          <CardTitle>Similar Stocks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative w-full">
+            <div
+              className="flex gap-4 overflow-x-auto scrollbar-hidden scroll-smooth p-4"
+              style={{ scrollSnapType: "x mandatory" }}
+            >
+              {stocks.map((stock, index) => (
+                <div
+                  key={index}
+                  className="border rounded-lg p-4 w-56 flex flex-col shrink-0"
+                  style={{ scrollSnapAlign: "center" }}
+                >
+                  <div className="font-medium">{stock.symbol}</div>
+                  <div className="text-sm text-muted-foreground">Sector: Technology</div>
+                  <div className="flex items-center justify-between text-sm mt-4">
+                    <div className="font-medium">${stock.currentPrice.toFixed(2)}</div>
+                    <div className={`flex items-center ${stock.changePercent > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {stock.changePercent > 0 ? '↑' : '↓'} {stock.changePercent}%
                     </div>
                   </div>
-                ))}
-              </div>
-
-              <button
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-100 p-2 rounded-full shadow-md hover:bg-gray-200"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-100 p-2 rounded-full shadow-md hover:bg-gray-200"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+                </div>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
             <AmazonTradingViewWidget />
             {/* <AmazonTradingViewProfileWidget /> */}
 

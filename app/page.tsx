@@ -11,6 +11,7 @@ import axios from "axios"
 import {DollarSign } from 'lucide-react'
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import StockCard from '@/components/comps/stockCard';
+import { fetchStockData } from "@/helpers/api"
 export default function Component() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [query, setquery] = useState('')
@@ -19,14 +20,16 @@ export default function Component() {
   const handlesearch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await axios.get(`http://localhost:3001/stock/daily?symbol=${query}`);
-      setStocks(response.data);
-      console.log(response.data);
+      const stockData = await fetchStockData(query); // Use the fetchStockData function
+      setStocks(stockData);
+      console.log(stockData);
+
+      // Navigate to the dashboard with the symbol in the query
       window.location.href = `/dashboard?symbol=${query}`;
     } catch (err) {
-      console.log(err)
+      console.error('Error fetching stock data:', err.message);
     }
-  }
+  };
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
