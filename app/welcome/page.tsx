@@ -32,6 +32,7 @@ export default function WelcomePage() {
           </div>
         </nav>
       </header>
+      
       <main className="flex-1 flex flex-col items-center text-center px-4">
         <section className="w-full flex items-center justify-center py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800">
           <div className="container px-4 md:px-6">
