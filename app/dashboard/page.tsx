@@ -9,14 +9,27 @@ import { Bell, Check, Search, TrendingUp, DollarSign } from 'lucide-react';
 import AmazonTradingViewWidget from "@/components/comps/amazontradingwidget";
 import TradingViewWidget from '@/components/comps/amazongraph';
 import '../globals.css';
-import { fetchMultipleStocks, addToWatchlist, fetchStockData } from '@/helpers/api';
-
+import { fetchMultipleStocks, addToWatchlist, fetchStockData, isStockInWatchlist,fetchDetailedStockData } from '@/helpers/api';
+import BuyModal from '@/components/comps/buyingModal';
+interface StockData {
+  stock_id: string
+  user_id: string
+  open_price: number
+  close_price: number
+  high_price: number
+  low_price: number
+  current_price: number
+}
 const Component = () => {
   const router = useRouter();
+  const [query, setQuery] = useState('');
   const [symbol, setSymbol] = useState<string | null>(null);
   const [currentStock, setCurrentStock] = useState<any | null>(null);
   const [stocks, setStock] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(false);
+  const [stockData, setStockData] = useState<StockData | null>(null); 
+  const [currentWatchlist, setCurrentWatchlist] = useState<boolean>(false);
   const [watchlistStatus, setWatchlistStatus] = useState<{ [key: string]: boolean }>({});
   const stockSymbols = ['AAPL', 'MSFT', 'NVDA', 'NFLX', 'TSLA'];
 
@@ -35,6 +48,10 @@ const Component = () => {
           console.log("stock data ", stockData);
           setCurrentStock({ symbol: stockData.symbol, change: stockData.changePercent, price: stockData.currentPrice });
           console.log(`Fetched stock data for ${symbolParam}:`, stockData);
+
+          // Check if the stock is in the watchlist
+          const isInWatchlist: boolean = await isStockInWatchlist(symbolParam);
+          setCurrentWatchlist(isInWatchlist);
         } catch (error) {
           if (error instanceof Error) {
             console.error(`Error fetching stock data for ${symbolParam}:`, error.message);
@@ -47,11 +64,28 @@ const Component = () => {
       } else {
         console.log("No symbol found in query params.");
       }
+      try {
+        if (symbol) {
+          const data = await fetchDetailedStockData(symbol); // Call the function
+          setStockData(data); // Update state with the fetched data
+          console.log("stockData1",stockData)
+        }
+      } catch (error) {
+        console.error("Error fetching stock data:", error);
+      }
 
       try {
         const data = await fetchMultipleStocks(stockSymbols);
         setStock(data);
         console.log('Fetched multiple stocks:', data);
+
+        // Check watchlist status for multiple stocks
+        const status: { [key: string]: boolean } = {};
+        for (const symbol of stockSymbols) {
+          const isInWatchlist = await isStockInWatchlist(symbol);
+          status[symbol] = isInWatchlist;
+        }
+        setWatchlistStatus(status);
       } catch (error) {
         if (error instanceof Error) {
           console.error(error.message);
@@ -62,13 +96,21 @@ const Component = () => {
     };
 
     fetchStocks();
-  }, []);
+  }, [symbol]);
+  useEffect(() => {
+    if (stockData) {
+      console.log("Updated stockData state:", stockData);
+    }
+  }, [stockData]); // Log whenever `stockData` is updated
 
   const handleAddToWatchlist = async (symbol: string, name: string) => {
     try {
       const response = await addToWatchlist(symbol, name);
       if (response.success) {
         setWatchlistStatus((prevState) => ({ ...prevState, [symbol]: true }));
+        if (symbol === currentStock?.symbol) {
+          setCurrentWatchlist(true);
+        }
       } else {
         console.error("Failed to add to watchlist");
       }
@@ -78,7 +120,10 @@ const Component = () => {
   };
 
   return (
+    <>
+   
     <div className="flex flex-col gap-6 p-4 md:p-6 max-w-7xl mx-auto">
+    { (stockData&&modal) && <BuyModal stockData={stockData} symbol={symbol || ''} onClose={() => setModal(false)} />}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center">
           <DollarSign className="h-6 w-6 text-primary" />
@@ -88,7 +133,13 @@ const Component = () => {
         <div className="flex-grow flex justify-center">
           <div className="relative w-2/3">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-8 text-sm" placeholder="Search more stocks..." type="search" />
+            <Input
+              className="pl-8 text-sm"
+              placeholder="Search more stocks..."
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
         </div>
       </div>
@@ -100,12 +151,11 @@ const Component = () => {
               <div className="text-xl font-bold">{currentStock?.symbol}</div>
               <div className="text-3xl font-bold mt-2">
                 ${currentStock?.price}
-                <span className="text-red-500 text-xl ml-2">{currentStock?.changePercent}</span>
+                <span className={`text-xl ml-2 ${currentStock?.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {currentStock?.change}
+                </span>
               </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                After Hours: $202.77{" "}
-                <span className="text-green-500">+0.079%</span>
-              </div>
+             
               <div className="text-xs text-muted-foreground">
                 Closed: Nov 15, 7:59 PM UTC-5 · USD · NASDAQ · Disclaimer
               </div>
@@ -116,9 +166,9 @@ const Component = () => {
                 onClick={() => symbol && handleAddToWatchlist(symbol, currentStock?.symbol || '')}
                 variant="outline"
                 size="sm"
-                disabled={watchlistStatus['AMZN']}
+                disabled={currentWatchlist}
               >
-                {watchlistStatus['AMZN'] ? (
+                {currentWatchlist ? (
                   <>
                     <Check className="mr-2 h-4 w-4" />
                     Added
@@ -130,7 +180,7 @@ const Component = () => {
                   </>
                 )}
               </Button>
-              <Button size="sm">
+              <Button onClick={()=>setModal(!modal)} size="sm">
                 <TrendingUp className="mr-2 h-4 w-4" />
                 Buy
               </Button>
@@ -193,6 +243,7 @@ const Component = () => {
       </div>
       <AmazonTradingViewWidget />
     </div>
+    </>
   );
 };
 
