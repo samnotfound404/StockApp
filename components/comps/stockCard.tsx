@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
-import TimeseriesChart from "@/components/comps/timeSeriesChart";
+import TimeSeriesChart from "@/components/comps/timeSeriesChart";
 
 interface StockCardProps {
   symbol: string;
@@ -23,10 +23,13 @@ const StockCard: React.FC<StockCardProps> = ({ symbol, companyName, isDarkMode }
     error: null,
   });
 
+  const [dateRange, setDateRange] = useState<string>("12M"); // Default to 12M
+
+  // Fetch stock data whenever the symbol or dateRange changes
   useEffect(() => {
     const fetchStockData = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/stock/daily?symbol=${symbol}`);
+        const response = await fetch(`http://localhost:3001/stock/daily?symbol=${symbol}&dateRange=${dateRange}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -55,9 +58,13 @@ const StockCard: React.FC<StockCardProps> = ({ symbol, companyName, isDarkMode }
     };
 
     fetchStockData();
-  }, [symbol]);
+  }, [symbol, dateRange]); // Re-fetch data when symbol or dateRange changes
 
   const { currentPrice, changePercent, loading, error } = stockData;
+
+  const handleDateRangeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setDateRange(event.target.value); // Update the dateRange state
+  };
 
   return (
     <Card>
@@ -73,13 +80,44 @@ const StockCard: React.FC<StockCardProps> = ({ symbol, companyName, isDarkMode }
           )}
         </div>
         {/* Percentage Change */}
-        {loading ? (
-          <div className="text-sm text-muted-foreground">Fetching data...</div>
-        ) : error ? null : (
-          <div className="text-sm text-muted-foreground">{changePercent} today</div>
-        )}
-        {/* Timeseries Chart */}
-        <TimeseriesChart className="w-full aspect-[4/3]" isDarkMode={isDarkMode} />
+        <div className="flex items-center">
+          {loading ? (
+            <div className="text-sm text-muted-foreground">Fetching data...</div>
+          ) : error ? (
+            <div className="text-sm text-red-500">Error fetching data</div>
+          ) : changePercent !== null && changePercent !== undefined ? (
+            <div
+              className={`flex items-center ${parseFloat(changePercent) > 0 ? 'text-green-500' : 'text-red-500'}`}
+            >
+              {parseFloat(changePercent) > 0 ? '↑' : '↓'} {changePercent}%
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">No data available</div>
+          )}
+        </div>
+        {/* Date Range Dropdown */}
+        <div className="flex justify-between items-center">
+          {/* <label htmlFor="dateRange" className="text-sm font-medium">Select Date Range:</label> */}
+          <select
+            id="dateRange"
+            value={dateRange}
+            onChange={handleDateRangeChange}
+            className="p-2 border border-gray-300 rounded-md"
+          >
+            <option value="1D">1D</option>
+            <option value="3M">3M</option>
+            <option value="12M">1Y</option>
+            <option value="60M">5Y</option>
+            <option value="ALL">All</option>
+          </select>
+        </div>
+
+        {/* Pass the dynamic symbol and dateRange to the TimeSeriesChart */}
+        <TimeSeriesChart
+          className="w-full aspect-[4/3]"
+          symbol={symbol}
+          dateRange={dateRange}
+        />
       </div>
     </Card>
   );

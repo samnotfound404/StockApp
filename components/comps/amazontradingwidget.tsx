@@ -17,7 +17,7 @@ const AmazonTradingViewProfileWidget = () => {
           height: 550,
           isTransparent: false,
           colorTheme: "light",
-          symbol: "NASDAQ:AAPL",
+          symbol: "NASDAQ:AMZN",
           locale: "en",
         });
         widgetContainer.appendChild(script);
@@ -58,7 +58,7 @@ const AmazonTradingViewWidget = () => {
         script.async = true;
         script.innerHTML = JSON.stringify({
           feedMode: "symbol",
-          symbol: "NASDAQ:AAPL",
+          symbol: "NASDAQ:AMZN",
           isTransparent: false,
           displayMode: "regular",
           width: 600,

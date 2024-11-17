@@ -18,7 +18,7 @@ function TradingViewWidget() {
         {
           "width": "1200",
           "height": "610",
-          "symbol": "NASDAQ:AAPL",
+          "symbol": "NASDAQ:AMZN",
           "interval": "D",
           "timezone": "Etc/UTC",
           "theme": "light",

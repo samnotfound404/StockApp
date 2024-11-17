@@ -16,18 +16,24 @@ export default function Component() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [query, setquery] = useState('')
   const [Stocks, setStocks] = useState([])
+  const stocks = [
+    { symbol: "AAPL", companyName: "Apple" },
+    { symbol: "MSFT", companyName: "Microsoft" },
+    { symbol: "AMZN", companyName: "Amazon" },
+    { symbol: "TSLA", companyName: "Tesla" },
+    { symbol: "NVDA", companyName: "Nvidia" },
+    { symbol: "GOOG", companyName: "Alphabet" },
+  ];
   
   const handlesearch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       const stockData = await fetchStockData(query); // Use the fetchStockData function
-      setStocks(stockData);
       console.log(stockData);
-
-      // Navigate to the dashboard with the symbol in the query
+      setStocks(stockData);
       window.location.href = `/dashboard?symbol=${query}`;
     } catch (err) {
-      console.error('Error fetching stock data:', err.message);
+      console.error('Error fetching stock data:',err.message);
     }
   };
   useEffect(() => {
@@ -93,36 +99,14 @@ export default function Component() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <StockCard
-        symbol="AAPL"
-        companyName="Apple Inc."
-        isDarkMode={true} // or false
-      />
-            <StockCard
-        symbol="MSFT"
-        companyName="Microsoft Corp"
-        isDarkMode={true} // or false
-      />
-            <StockCard
-        symbol="AMZN"
-        companyName="Amazon.com, Inc."
-        isDarkMode={true} // or false
-      />
-      <StockCard
-        symbol="TSLA"
-        companyName="Tesla, Inc."
-        isDarkMode={true} // or false
-      />
-      <StockCard
-        symbol="NVDA"
-        companyName="Nvidia Corporation"
-        isDarkMode={true} // or false
-      />
-      <StockCard
-        symbol="GOOG"
-        companyName="Alphabet Inc."
-        isDarkMode={true} // or false
-      />
+          {stocks.map((stock) => (
+        <StockCard
+          key={stock.symbol}
+          symbol={stock.symbol}
+          companyName={stock.companyName}
+          isDarkMode={true}
+        />
+      ))}
           </div>
         </section>
         <section className="w-full lg:w-[40vw]">
