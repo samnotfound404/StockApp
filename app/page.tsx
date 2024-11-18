@@ -13,6 +13,14 @@ import StockCard from '@/components/comps/stockCard';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import SearchWidget from "@/components/comps/searchwidget";
 export default function Component() {
+  interface watchlistDetail {
+    stock_id: string;
+    symbol: string;
+    company_name: string;
+    currentPrice: number;
+    changePercent: number;
+  }
+  const [watchlistDetails, setWatchlistDetails] = useState<watchlistDetail[]>([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [query, setQuery] = useState('');
   const [stocks, setStocks] = useState([]);
@@ -53,12 +61,32 @@ function handleSearch1(term:string){
     replace(`${pathname}?${params.toString()}`);
 }
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    const fetchWatchlistData = async () => {
+      try {
+        const watchlistData = await fetchWatchlist();
+        console.log(watchlistData);
+        const formattedWatchlistData = watchlistData.map((item: any) => ({
+          ...item,
+          changePercent: parseFloat(item.changePercent),
+        }));
+        console.log("abcd",formattedWatchlistData);
+        setWatchlistDetails(formattedWatchlistData);
+      } catch (error) {
+        console.error('Error fetching watchlist data:', error);
+      }
     }
+    fetchWatchlistData();
   }, [isDarkMode]);
+
+  const handleRemoveFromWatchlist = async (stock_id:string) => {
+    try {
+      await removeFromWatchlist(stock_id);
+      const updatedWatchlist = watchlistDetails.filter((item) => item.stock_id !== stock_id);
+      setWatchlistDetails(updatedWatchlist);
+    } catch (error) {
+      console.error('Error removing stock from watchlist:', error);
+    }
+  }
 
   return (
     <div>
@@ -179,27 +207,31 @@ function handleSearch1(term:string){
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Symbol</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Change</TableHead>
+
+                      <TableHead className="font-bold">Company Name</TableHead>
+                      <TableHead className="font-bold">Symbol</TableHead>
+                      <TableHead className="font-bold">Price</TableHead>
+                      <TableHead className="font-bold">Change</TableHead>
+                      <TableHead className="font-bold">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>AAPL</TableCell>
-                      <TableCell>$130.25</TableCell>
-                      <TableCell className="text-primary">+2.5%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>MSFT</TableCell>
-                      <TableCell>$280.15</TableCell>
-                      <TableCell className="text-muted-foreground">-1.2%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>AMZN</TableCell>
-                      <TableCell>$3,150.75</TableCell>
-                      <TableCell className="text-primary">+0.8%</TableCell>
-                    </TableRow>
+                    {watchlistDetails?.map((item) => (
+                      <TableRow key={item.stock_id}>
+
+                        <TableCell>{item.company_name}</TableCell>
+                        <TableCell>{item.symbol}</TableCell>
+                        <TableCell>${item.currentPrice.toFixed(2)}</TableCell>
+                        <TableCell className={item.changePercent > 0 ? "text-green-500" : "text-red-500"}>
+                          {item.changePercent > 0 ? `+${item.changePercent.toFixed(2)}%` : `${item.changePercent.toFixed(2)}%`}
+                        </TableCell>
+                        <TableCell>
+                          <Button onClick={()=>handleRemoveFromWatchlist(item.stock_id)} variant="outline" size="sm">
+                            Remove
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </CardContent>
