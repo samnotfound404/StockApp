@@ -63,7 +63,7 @@ export default function SignIn() {
     if (error) {
       setError(error.message)
     } else {
-      router.push('/portfolio') 
+      router.push('/Portfolio') 
     }
   }
 

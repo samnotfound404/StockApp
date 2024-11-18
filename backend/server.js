@@ -23,6 +23,45 @@ app.post('/fetch-bank-details', async (req, res) => {
     res.status(500).json({ message: 'Error fetching bank details.' });
   }
 });
+// Load environment variables
+require('dotenv').config();
+
+// Import required packages
+const Razorpay = require('razorpay');
+const bodyParser = require('body-parser');
+
+// Initialize Razorpay instance
+const razorpay = new Razorpay({
+  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET_ID
+});
+
+// Initialize Express app
+app.use(bodyParser.json()); // Middleware to parse JSON request body
+
+// POST route to create order
+app.post('/create-order', async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const options = {
+      amount: amount, // Amount in smallest currency unit (e.g., paise for INR)
+      currency: 'INR',
+    };
+    const order = await razorpay.orders.create(options);
+
+    console.log(order);
+    return res.status(200).json({ razorpay_order_id: order.id });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to create order' });
+  }
+});
+
+// Start the server
+// const PORT = process.env.PORT || 3001;
+// app.listen(PORT, () => {
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// });
 
 
 app.get('/stock/daily', async (req, res) => {

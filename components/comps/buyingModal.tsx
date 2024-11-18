@@ -15,6 +15,12 @@ import {
   DialogTitle,
 } from "../ui/dialog"
 import { ArrowUpDown, DollarSign, TrendingUp, TrendingDown } from 'lucide-react'
+import Script from 'next/script'
+declare global {
+  interface Window {
+      Razorpay: any;
+  }
+}
 
 interface StockData {
   stock_id: string
@@ -36,7 +42,7 @@ export default function BuyModal({ stockData, symbol, onClose }: BuyModalProps) 
   const [quantity, setQuantity] = useState(1)
   const [total, setTotal] = useState(stockData.current_price)
   const [isOpen, setIsOpen] = useState(true)
-  const [view, setView] = useState(true)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = parseInt(e.target.value) || 0
@@ -45,25 +51,62 @@ export default function BuyModal({ stockData, symbol, onClose }: BuyModalProps) 
   }
 
   const handleBuy = async () => {
+    if (isProcessing) return; // Prevent multiple clicks
     
-   
+    setIsProcessing(true);
+
     try {
-      addStockPurchase(stockData, quantity)
+      // Create Razorpay order
+      const response = await fetch('http://localhost:3001/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount: total * 100 }), // Total in paise
+      });
+      const data = await response.json();
+      const orderId = data.razorpay_order_id;
+      if (!orderId) {
+        alert('Failed to create order');
+        return;
+      }
+
+      // Initialize Razorpay options
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Razorpay Key ID
+        amount: total * 100, // Total amount in paise
+        currency: "INR",
+        name: "Your Company Name",
+        description: `Buying ${quantity} shares of ${symbol}`,
+        order_id: orderId, // Order ID returned from your backend
+        handler: function (response: any) {
+          console.log("Payment successful", response);
+          alert(`Payment successful! Transaction ID: ${response.razorpay_payment_id}`);
+          addStockPurchase(stockData, quantity); // Proceed with stock purchase after successful payment
+        },
+        prefill: {
+          name: "John Doe",
+          email: "johndoe@example.com",
+          contact: "9999999999",
+        },
+        theme: {
+          color: "#3399CC",
+        },
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.open();
     } catch (error) {
-        console.error('Error purchasing stock:', error)
+      console.error("Payment failed", error);
+      alert("Payment failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
     }
-
-    console.log(`Buying ${quantity} shares of ${stockData.stock_id} for $${total.toFixed(2)}`)
-    // You would typically make an API call here to process the purchase
-    setIsOpen(false)
-    onClose()
   }
-
-
 
   return (
     <>
-      
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -106,7 +149,7 @@ export default function BuyModal({ stockData, symbol, onClose }: BuyModalProps) 
           </motion.div>
           <DialogFooter>
             <Button onClick={handleBuy} className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6">
-              Confirm Purchase
+              {isProcessing ? "Processing..." : "Confirm Purchase"}
             </Button>
           </DialogFooter>
           <motion.div
