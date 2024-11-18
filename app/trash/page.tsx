@@ -1,80 +1,60 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
+'use client'
+import { useState } from "react";
 import axios from "axios";
-interface Stock {
-  symbol: string;
-  name: string;
-  currency: string;
-  stockExchange: string;
-  exchangeShortName: string;
-}
-export default function StockSearchComponent() {
-  const [query, setQuery] = useState<string>("");
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const handleSearch = (term: string) => {
-    setQuery(term);
-    const params = new URLSearchParams(searchParams as any);
-    if (term) {
-      params.set("query", term);
-    } else {
-      params.delete("query");
+
+export default function Home() {
+  // States for stock symbol, image URL, and error messages
+  const [symbol, setSymbol] = useState<string>("");
+  const [image, setImage] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission
+    setError("");
+    setImage(null);
+
+    try {
+      // Send POST request to Colab notebook API
+      const response = await axios.post(
+        "http://<colab-ngrok-url>/predict", // Replace with your ngrok URL
+        { symbol },
+        { responseType: "arraybuffer" } // Ensure response is treated as binary data
+      );
+
+      // Create a URL for the image blob
+      const blob = new Blob([response.data], { type: "image/png" });
+      const imageUrl = URL.createObjectURL(blob);
+      setImage(imageUrl); // Set the image URL to state
+    } catch (err: any) {
+      // Handle errors
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || "An error occurred.");
+      } else {
+        setError("An unexpected error occurred.");
+      }
     }
-    router.replace(`${pathname}?${params.toString()}`);
   };
-  useEffect(() => {
-    if (query.trim().length > 0) {
-      const fetchStocks = async () => {
-        try {
-          const response = await axios.get(
-            `https://financialmodelingprep.com/api/v3/search?query=${query}&apikey=vZ8CiaC1bYFjuCYSJkd01zZ8MBF4haR0`
-          );
-          const filteredStocks = response.data.filter(
-            (stock: Stock) => stock.exchangeShortName === "NASDAQ"
-          );
-          setStocks(filteredStocks);
-        } catch (error) {
-          console.error("Error fetching stock data:", error);
-        }
-      };
-      fetchStocks();
-    } else {
-      setStocks([]);
-    }
-  }, [query]);
-  const handleStockSelect = (symbol: string) => {
-    router.push(`/dashboard?symbol=${symbol}`);
-  };
+
   return (
-    <div className="relative">
-      <form onSubmit={(e) => e.preventDefault()}>
-        <Input
-          type="search"
-          placeholder="Search stocks..."
-          value={query}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="pl-8 w-full"
+    <div style={{ padding: "2rem" }}>
+      <h1>Stock Price Prediction</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Enter stock symbol (e.g., NVDA)"
+          value={symbol}
+          onChange={(e) => setSymbol(e.target.value)} // Update symbol state
+          required
         />
+        <button type="submit">Predict</button>
       </form>
-      {stocks.length > 0 && (
-        <ul className="absolute bg-white shadow-lg border border-gray-200 rounded-md mt-1 w-full z-10">
-          {stocks.map((stock) => (
-            <li
-              key={stock.symbol}
-              onClick={() => handleStockSelect(stock.symbol)}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-            >
-              <div className="font-bold">{stock.symbol}</div>
-              <div className="text-sm text-gray-500">{stock.name}</div>
-            </li>
-          ))}
-        </ul>
-      )}
+
+      {/* Display error message if any */}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {/* Display the generated image if available */}
+      {image && <img src={image} alt="Stock Prediction Plot" />}
     </div>
   );
 }
