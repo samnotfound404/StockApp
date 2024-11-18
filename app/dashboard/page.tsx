@@ -32,7 +32,6 @@ const Component = () => {
   const [currentWatchlist, setCurrentWatchlist] = useState<boolean>(false);
   const [watchlistStatus, setWatchlistStatus] = useState<{ [key: string]: boolean }>({});
   const stockSymbols = ['AAPL', 'MSFT', 'NVDA', 'NFLX', 'TSLA'];
-
   useEffect(() => {
     const fetchStocks = async () => {
       const query = new URLSearchParams(window.location.search);
@@ -143,12 +142,11 @@ const Component = () => {
           </div>
         </div>
       </div>
-
       <div className="grid gap-6 md:grid-cols-1">
         <Card>
           <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 pb-4">
             <div>
-              <div className="text-xl font-bold">{currentStock?.symbol}</div>
+            <div className="text-xl font-bold">{currentStock?.symbol?.toUpperCase()}</div>
               <div className="text-3xl font-bold mt-2">
                 ${currentStock?.price}
                 <span className={`text-xl ml-2 ${currentStock?.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
